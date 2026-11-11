@@ -206,6 +206,25 @@ html,body{background:#f7f8fc}
 #wallpaper{background-position:center center;background-size:cover;background-repeat:no-repeat}
 #device.wallpaper-home #wallpaper{filter:blur(11px) brightness(.94);transform:scale(1.05)}
 #device:not(.wallpaper-home):not(.wallpaper-pass) #wallpaper{filter:none}
+
+/* Passcode contrast + individualized hint, and readable white desktop captions. */
+#device .passcode .pass-title,
+#device .passcode .pass-hint,
+#device .passcode .pass-back,
+#device .passcode .pass-error,
+#device .passcode .key.small {
+  color: #fff !important;
+  opacity: 1;
+  text-shadow: 0 1px 4px rgba(0,0,0,.9), 0 2px 12px rgba(0,0,0,.65);
+}
+#device .passcode .dots span {border-color:#fff !important;box-shadow:0 1px 5px rgba(0,0,0,.35)}
+#device .passcode .dots span.on {background:#fff !important}
+#device .desktop .app-icon,
+#device .desktop .app-icon span,
+#device .desktop .dock .app-icon {
+  color:#fff !important;
+  text-shadow:0 1px 3px rgba(0,0,0,.9),0 2px 8px rgba(0,0,0,.7) !important;
+}
 </style>
 </head>
 <body>
@@ -256,7 +275,7 @@ html,body{background:#f7f8fc}
 </section>
 <section class="device hidden" id="device"><div class="screen" id="screen"><div class="wallpaper" id="wallpaper"></div><div class="island"></div><div class="status" id="status"><span id="status-time">9:41</span><div class="status-right"><svg><use href="#i-signal"></use></svg><svg><use href="#i-wifi"></use></svg><svg><use href="#i-battery"></use></svg></div></div>
 <div class="lock" id="lock"><div class="lock-date" id="lock-date">11月10日 星期二</div><div class="lock-time" id="lock-time">9:41</div><div class="lock-bottom"><button id="unlock">向上轻扫以解锁</button></div></div>
-<div class="passcode hidden" id="passcode"><div class="pass-title">输入密码</div><div class="pass-hint">提示：猪猪的生日</div><div class="dots" id="dots"></div><div class="keypad" id="keypad"></div><div class="pass-error" id="pass-error"></div><button class="pass-back" id="cancel-pass">取消</button></div>
+<div class="passcode hidden" id="passcode"><div class="pass-title">输入密码</div><div class="pass-hint">提示：猪诞日</div><div class="dots" id="dots"></div><div class="keypad" id="keypad"></div><div class="pass-error" id="pass-error"></div><button class="pass-back" id="cancel-pass">取消</button></div>
 <div class="desktop hidden" id="desktop"><div class="desk-clock"><strong id="desk-time">9:41</strong><span id="desk-date">11月10日 星期二</span></div><div class="app-grid" id="grid"></div><div class="page-dots"><i></i><i style="opacity:.4"></i></div><div class="dock" id="dock"></div></div>
 <div id="app-layer"></div><div aria-live="polite" class="evidence-status hidden" id="evidence-status"><span>暗恋证据</span><strong id="evidence-count">0/5</strong></div><div aria-live="polite" class="evidence-banner hidden" id="evidence-banner"><strong id="evidence-banner-title">发现暗恋证据</strong><span id="evidence-banner-sub">1/5</span></div><button aria-label="返回手机选择" class="return-picker" id="return-picker" type="button">‹ <span>选择手机</span></button><div class="homebar light" id="homebar" title="返回桌面"></div><div class="toast hidden" id="toast"></div><div class="overlay hidden" id="sheet"><div class="sheet"><h3 id="sheet-title">暗恋证据</h3><p id="sheet-message">当前收集进度：0/5。故事内容尚未加入，可在各应用中点击测试证据位置体验收集流程。</p><button class="hidden" id="finish-level">测试完成</button><button class="secondary" id="close-sheet">继续探索</button><button class="secondary" id="switch-phone">返回手机选择</button></div></div></div></section>
 </div>
@@ -293,10 +312,10 @@ const setClock=()=>{const t=displayTime(),d=dateText();$('#status-time').textCon
 function showToast(text){const t=$('#toast');t.textContent=text;t.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.add('hidden'),2400)}
 function showChooser(){setClock();$device.classList.remove('wallpaper-home','wallpaper-pass');closeApp();$('#evidence-banner').classList.add('hidden');$('#evidence-status').classList.add('hidden');typed='';drawDots();$passcode.classList.add('hidden');$desktop.classList.add('hidden');$lock.classList.remove('hidden');unlocked=false;$device.classList.add('hidden');$choose.classList.remove('hidden');$sheet.classList.add('hidden')}
 function updatePicker(){let yes=evidenceComplete();$('#pick-gao').disabled=!yes;const lock=$('#pick-gao .mini-lock');if(lock)lock.classList.toggle('hidden',yes)}
-function enterPhone(which){setClock();owner=which;$choose.classList.add('hidden');$device.classList.remove('hidden');$device.classList.remove('wallpaper-home','wallpaper-pass');const wp=$('#pick-'+which+' .preview-wallpaper');const wall=$('#wallpaper');wall.style.setProperty('background-image',wp?`url("${wp.src}")`:'none','important');$lock.classList.remove('hidden');$passcode.classList.add('hidden');$desktop.classList.add('hidden');closeApp();unlocked=false;typed='';$('#homebar').classList.add('light');updateEvidenceUI()}
+function enterPhone(which){setClock();owner=which;$('#passcode .pass-hint').textContent='提示：'+(which==='gao'?'鸭诞日':'猪诞日');$choose.classList.add('hidden');$device.classList.remove('hidden');$device.classList.remove('wallpaper-home','wallpaper-pass');const wp=$('#pick-'+which+' .preview-wallpaper');const wall=$('#wallpaper');wall.style.setProperty('background-image',wp?`url("${wp.src}")`:'none','important');$lock.classList.remove('hidden');$passcode.classList.add('hidden');$desktop.classList.add('hidden');closeApp();unlocked=false;typed='';$('#homebar').classList.add('light');updateEvidenceUI()}
 function openPass(){if(unlocked)return;$device.classList.add('wallpaper-pass');$device.classList.remove('wallpaper-home');$lock.classList.add('hidden');$passcode.classList.remove('hidden');typed='';drawDots()}
 function drawDots(){const el=$('#dots');if(el.children.length!==6)el.innerHTML='<span></span>'.repeat(6);Array.from(el.children).forEach((dot,i)=>dot.classList.toggle('on',i<typed.length))}
-function passDigit(k){if(errorTimer){clearTimeout(errorTimer);errorTimer=null}if(k==='del'){typed=typed.slice(0,-1)}else if(typed.length<6){typed+=k}drawDots();$('#pass-error').textContent='';if(typed.length===6){if(typed==='131121'){unlocked=true;$device.classList.remove('wallpaper-pass');$device.classList.add('wallpaper-home');$passcode.classList.add('hidden');$desktop.classList.remove('hidden');$('#homebar').classList.remove('light');renderGrid();updateEvidenceUI()}else{$('#pass-error').textContent='密码错误，请重试';errorTimer=setTimeout(()=>{typed='';drawDots();errorTimer=null},530)}}}
+function passDigit(k){if(errorTimer){clearTimeout(errorTimer);errorTimer=null}if(k==='del'){typed=typed.slice(0,-1)}else if(typed.length<6){typed+=k}drawDots();$('#pass-error').textContent='';if(typed.length===6){if(typed===(owner==='gao'?'121117':'131121')){unlocked=true;$device.classList.remove('wallpaper-pass');$device.classList.add('wallpaper-home');$passcode.classList.add('hidden');$desktop.classList.remove('hidden');$('#homebar').classList.remove('light');renderGrid();updateEvidenceUI()}else{$('#pass-error').textContent='密码错误，请重试';errorTimer=setTimeout(()=>{typed='';drawDots();errorTimer=null},530)}}}
 $('#keypad').innerHTML=['1','2','3','4','5','6','7','8','9','', '0','del'].map(k=>k?`<button class="key ${k==='del'?'small':''}" data-digit="${k}">${k==='del'?'删除':k}</button>`:'<span class="key empty"></span>').join('');
 $('#keypad').onclick=e=>{const b=e.target.closest('[data-digit]');if(b)passDigit(b.dataset.digit)};
 $('#keypad').addEventListener('dblclick',e=>e.preventDefault());let lastKeyTouch=0;$('#keypad').addEventListener('touchend',e=>{if(e.target.closest('[data-digit]')){lastKeyTouch=Date.now();e.preventDefault();const b=e.target.closest('[data-digit]');if(b)passDigit(b.dataset.digit)}},{passive:false});
